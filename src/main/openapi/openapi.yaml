@@ -12,12 +12,11 @@ tags:
   - name: Order
     description: Manage orders
 
-
+x-enable-mcp-server: true
 paths:
   /orders:
     get:
       tags: [order]
-      x-disable-mcp: true
       summary: List all orders
       description: Retrieves a list of all orders, with an option to filter by status.
       operationId: listOrders
@@ -78,6 +77,7 @@ paths:
           description: Order not found.
     put:
       tags: [order]
+      x-enable-mcp-operation: true
       summary: Update an existing order
       description: Updates an order's information, for example its status.
       operationId: updateOrder
