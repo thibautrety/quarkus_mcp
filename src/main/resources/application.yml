@@ -1,0 +1,10 @@
+"%prod,dev":
+  quarkus:
+    http:
+      cors:
+        ~: true
+        origins: /.*/
+      root-path: /
+      port : 8082
+    log:
+      level: INFO

@@ -1,0 +1,88 @@
+package {{package}};
+
+import {{package}}.*;
+import {{modelPackage}}.*;
+import io.quarkiverse.mcp.server.Tool;
+import io.quarkiverse.mcp.server.ToolArg;
+import jakarta.enterprise.context.ApplicationScoped;
+import lombok.AllArgsConstructor;
+
+{{#operations}}
+{{#operation}}
+{{#isMultipart}}
+import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
+{{/isMultipart}}
+{{/operation}}
+{{/operations}}
+
+{{#imports}}
+import {{import}};
+{{/imports}}
+
+import java.util.List;
+import {{package}}.NotFoundException;
+import java.io.InputStream;
+
+{{#useBeanValidation}}
+import {{javaxPackage}}.validation.constraints.*;
+import {{javaxPackage}}.validation.Valid;
+{{/useBeanValidation}}
+
+import {{javaxPackage}}.ws.rs.core.Response;
+import {{javaxPackage}}.ws.rs.core.SecurityContext;
+
+{{>generatedAnnotation}}
+
+{{#operations}}
+public interface {{classname}}Service {
+    {{#operation}}
+    Response {{nickname}}(
+        {{#isMultipart}}MultipartFormDataInput input,{{/isMultipart}}
+        {{#allParams}}
+        {{>serviceQueryParams}}{{>servicePathParams}}{{>serviceHeaderParams}}{{>serviceBodyParams}}{{^isMultipart}}{{>serviceFormParams}},{{/isMultipart}}{{#isMultipart}}{{^isFormParam}},{{/isFormParam}}{{/isMultipart}}
+        {{/allParams}}
+        SecurityContext securityContext
+    ) throws NotFoundException;
+
+    default Response {{nickname}}(
+        {{#isMultipart}}MultipartFormDataInput input,{{/isMultipart}}
+        {{#allParams}}
+        {{>serviceQueryParams}}{{>servicePathParams}}{{>serviceHeaderParams}}{{>serviceBodyParams}}{{^isMultipart}}{{>serviceFormParams}}{{^last}}, {{/last}}{{/isMultipart}}{{#isMultipart}}{{^isFormParam}}{{^last}}, {{/last}}{{/isFormParam}}{{/isMultipart}}
+        {{/allParams}}
+        String context
+    ) throws NotFoundException {
+        return {{nickname}}(
+            {{#isMultipart}}input,{{/isMultipart}}
+            {{#allParams}}{{paramName}},{{/allParams}}
+            (SecurityContext)null
+        );
+    }
+    {{/operation}}
+}
+
+@ApplicationScoped
+@AllArgsConstructor
+class Mcp{{classname}}Service {
+    {{classname}}Service service;
+
+    {{#operation}}
+    {{^vendorExtensions.x-disable-mcp}}
+    @Tool(description = "{{summary}}")
+    public Response {{nickname}}(
+        {{#isMultipart}}MultipartFormDataInput input,{{/isMultipart}}
+        {{#allParams}}
+        @ToolArg(description = "{{description}}", required = false)
+        {{>serviceQueryParams}}{{>servicePathParams}}{{>serviceHeaderParams}}{{>serviceBodyParams}}{{^isMultipart}}{{>serviceFormParams}}{{^last}}, {{/last}}{{/isMultipart}}{{#isMultipart}}{{^isFormParam}}{{^last}}, {{/last}}{{/isFormParam}}{{/isMultipart}}
+        {{/allParams}}
+        String context
+    ) throws NotFoundException {
+        return service.{{nickname}}(
+            {{#isMultipart}}input,{{/isMultipart}}
+            {{#allParams}}{{paramName}},{{/allParams}}
+            (SecurityContext)null
+        );
+    }
+    {{/vendorExtensions.x-disable-mcp}}
+    {{/operation}}
+}
+{{/operations}}

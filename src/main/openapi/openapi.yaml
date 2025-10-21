@@ -1,0 +1,198 @@
+openapi: 3.0.2
+info:
+  title: Order Management API
+  description: A simple API to create, list, update, and delete orders.
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Local server
+
+tags:
+  - name: Order
+    description: Manage orders
+
+
+paths:
+  /orders:
+    get:
+      tags: [order]
+      x-disable-mcp: true
+      summary: List all orders
+      description: Retrieves a list of all orders, with an option to filter by status.
+      operationId: listOrders
+      parameters:
+        - name: status
+          in: query
+          description: Filters orders by status.
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of orders.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Order'
+    post:
+      tags: [order]
+      summary: Create a new order
+      description: Adds a new order to the system.
+      operationId: createOrder
+      requestBody:
+        description: The Order object to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewOrder'
+      responses:
+        '201':
+          description: Order created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '400':
+          description: Invalid input data.
+
+  /orders/{orderId}:
+    get:
+      tags: [order]
+      summary: Find an order by its ID
+      description: Retrieves the details of a specific order.
+      operationId: getOrderById
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '200':
+          description: Order details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order not found.
+    put:
+      tags: [order]
+      summary: Update an existing order
+      description: Updates an order's information, for example its status.
+      operationId: updateOrder
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      requestBody:
+        description: The fields of the order to update.
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                status:
+                  type: string
+
+      responses:
+        '200':
+          description: Order updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+        '404':
+          description: Order not found.
+    delete:
+      tags: [order]
+      summary: Delete an order
+      description: Deletes an order by its ID.
+      operationId: deleteOrder
+      parameters:
+        - $ref: '#/components/parameters/OrderId'
+      responses:
+        '204':
+          description: Order deleted successfully.
+        '404':
+          description: Order not found.
+
+components:
+  schemas:
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          
+          description: Unique identifier for the order.
+          readOnly: true
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderItem'
+        totalAmount:
+          type: number
+          format: double
+          description: Total amount of the order.
+          readOnly: true
+        status:
+          type: string
+          description: Current status of the order.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp of when the order was created.
+          readOnly: true
+      required:
+        - id
+        - items
+        - totalAmount
+        - status
+        - createdAt
+
+    NewOrder:
+      type: object
+      properties:
+        customerName:
+          type: string
+          description: Name of the customer placing the order.
+          example: "John Doe"
+        items:
+          type: array
+          description: List of products being ordered.
+          items:
+            $ref: '#/components/schemas/OrderItem'
+      required:
+        - customerName
+        - items
+
+    OrderItem:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: The product ID.
+          example: "PROD-123"
+        quantity:
+          type: integer
+          description: Quantity of the product ordered.
+          example: 2
+        unitPrice:
+          type: number
+          format: double
+          description: Price of a single unit of the product.
+          example: 25.50
+      required:
+        - productId
+        - quantity
+        - unitPrice
+
+  parameters:
+    OrderId:
+      name: orderId
+      in: path
+      required: true
+      description: The ID of the order to retrieve.
+      schema:
+        type: string
+        
