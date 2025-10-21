@@ -59,14 +59,14 @@ public interface {{classname}}Service {
     }
     {{/operation}}
 }
-
+{{#vendorExtensions.x-enable-mcp-server}}
 @ApplicationScoped
 @AllArgsConstructor
 class Mcp{{classname}}Service {
     {{classname}}Service service;
 
     {{#operation}}
-    {{^vendorExtensions.x-disable-mcp}}
+    {{#vendorExtensions.x-enable-mcp-operation}}
     @Tool(description = "{{summary}}")
     public Response {{nickname}}(
         {{#isMultipart}}MultipartFormDataInput input,{{/isMultipart}}
@@ -82,7 +82,8 @@ class Mcp{{classname}}Service {
             (SecurityContext)null
         );
     }
-    {{/vendorExtensions.x-disable-mcp}}
+    {{/vendorExtensions.x-enable-mcp-operation}}
     {{/operation}}
 }
+{{/vendorExtensions.x-enable-mcp-server}}
 {{/operations}}
