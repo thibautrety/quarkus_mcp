@@ -8,12 +8,16 @@ When this command is run, the openapi spec located in src/main/resources/openapi
 ## How to update the generation
 The mustache template is located in src/main/resources/openapi-templates/JavaJaxRS/resteasy <br/>
 This template specifies the code generation for each operation defined in the openapi spec.
-If you want to disable mcp server on some operations, you can add the following extension to the operation in the openapi spec :
+If you want to enable mcp server, you have to specify in your openapi spec :
 ```yaml
-x-disable-mcp: true
+x-enable-mcp-server: true
+```
+and you have to specify for each operation
+```yaml
+x-enable-mcp-operation: true
 ```
 
-In this example, the put operation on orders is disabled.
+In this example, the put operation on orders is the only one enabled.
 
 # About Quarkus usage
 
